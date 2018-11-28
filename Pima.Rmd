@@ -1,9 +1,14 @@
 ---
 title: "Pima"
+author: "Brian Burrows, Eric Sellew, Yonas Shiferaw, and Kelly Yang"
+date: "12/3/2018"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 require(mosaic)
 
@@ -11,29 +16,58 @@ require(mosaic)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE)
+colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
+```
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+
+=======
+## Predict the probability that individual females have diabetes
+>>>>>>> 9319109b8f255227aa6f4973ccfae4f7f955da64
+
+```{r}
+tally(pima$RESPONSE)
+268/(500+268)
+#Approximately 35% of the individual females in this sample have diabetes 
+```
+
+## EDA
+
+```{r}
+summary(pima)
+histogram(~PRG, data=pima) #PRG is skewed to the right
+histogram(~PLASMA, data=pima) #rather bell-shaped
+histogram(~BP, data=pima) #normal, but why are there so many 0s???
+histogram(~THICK, data=pima) #many zeros, and one outlier at 99, but normal otherwise
+histogram(~INSULIN, data=pima) #skewed to the right
+histogram(~BODY, data=pima) #kind of normal, slightly skewed to the right, many zeros
+histogram(~PEDIGREE, data=pima) #skewed to the right
+histogram(~AGE, data=pima) #skewed to the right
+tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
+```
+
+
 
 
 ```{r}
-Pima <- read.csv("~/git/Pima-Native-Americans-and-Diabetes/Pima.FinalReport..txt", header=FALSE)
-colnames(Pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
+pima_age <- pima %>%
+  group_by(AGE, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
+
+ggplot(pima, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
+
 ```
+
+
+## Plots
 
 ```{r}
-
-
+ggplot(pima, aes(x=AGE, y=BP)) + geom_bar(stat="identity", position = "dodge")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
