@@ -28,16 +28,33 @@ tally(pima$RESPONSE)
 #Approximately 35% of the individual females in this sample have diabetes 
 ```
 
+## EDA
 
 ```{r}
+summary(pima)
+histogram(~PRG, data=pima) #PRG is skewed to the right
+histogram(~PLASMA, data=pima) #rather bell-shaped
+histogram(~BP, data=pima) #normal, but why are there so many 0s???
+histogram(~THICK, data=pima) #many zeros, and one outlier at 99, but normal otherwise
+histogram(~INSULIN, data=pima) #skewed to the right
+histogram(~BODY, data=pima) #kind of normal, slightly skewed to the right, many zeros
+histogram(~PEDIGREE, data=pima) #skewed to the right
+histogram(~AGE, data=pima) #skewed to the right
+tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
+```
 
+```{r}
+pima_age <- pima %>%
+  group_by(AGE, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
 ```
 
 
 ## Plots
 
 ```{r}
-ggplot(pima, aes(x=response, y=tally(response))) + geom_bar(stat="identity")
+ggplot(pima, aes(x=AGE, y=BP)) + geom_bar(stat="identity", position = "dodge")
 ```
 
 
