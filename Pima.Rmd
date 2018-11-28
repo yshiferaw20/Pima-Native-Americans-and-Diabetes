@@ -97,6 +97,15 @@ ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
   geom_density(alpha=0.5)
 ```
 
+```{r}
+pima_pedigree <- pima %>%
+  group_by(PEDIGREE, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+#Pedigree may not be overly important; however, it does seem that 
+```
+
 
 ## Plots
 
