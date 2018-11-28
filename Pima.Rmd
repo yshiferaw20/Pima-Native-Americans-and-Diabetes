@@ -45,9 +45,56 @@ tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
 
 ```{r}
 pima_age <- pima %>%
+  filter(RESPONSE == 1) %>%
   group_by(AGE, RESPONSE) %>%
   summarize(response_total = n())
-ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
+ggplot(pima_age, aes(x=AGE, y=response_total)) +
+  geom_density(stat="identity")
+```
+
+```{r}
+pima_bp <- pima %>%
+  filter(BP > 0) %>%
+  group_by(BP, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_bp, aes(x=BP, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+```
+
+
+```{r}
+pima_thick <- pima %>%
+  filter(THICK > 0) %>%
+  group_by(THICK, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_thick, aes(x=THICK, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+#looks like females with greater thickness tend to have 
+```
+
+```{r}
+pima_plasma <- pima %>%
+  group_by(PLASMA, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_plasma, aes(x=PLASMA, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+```
+
+```{r}
+pima_insulin <- pima %>%
+  group_by(INSULIN, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_insulin, aes(x=INSULIN, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+```
+
+
+```{r}
+pima_body <- pima %>%
+  group_by(BODY, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
 ```
 
 
