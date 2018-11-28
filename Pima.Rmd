@@ -1,34 +1,43 @@
 ---
 title: "Pima"
+author: "Brian Burrows, Eric Sellew, Yonas Shiferaw, and Kelly Yang"
+date: "12/3/2018"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r}
+pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE)
+colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
+```
+
+## Predict the probability that individual females have diabetes
+
+```{r}
+tally(pima$RESPONSE)
+268/(500+268)
+#Approximately 35% of the individual females in this sample have diabetes 
+```
 
 
 ```{r}
-Pima <- read.csv("~/git/Pima-Native-Americans-and-Diabetes/Pima.FinalReport..txt", header=FALSE)
-colnames(Pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
+
 ```
+
+
+## Plots
 
 ```{r}
-
+ggplot(pima, aes(x=response, y=tally(response))) + geom_bar(stat="identity")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
