@@ -28,6 +28,20 @@ tally(pima$RESPONSE)
 #Approximately 35% of the individual females in this sample have diabetes 
 ```
 
+```{r}
+filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0)
+```
+
+```{r}
+model <- glm(RESPONSE~., data=pima, family=binomial) %>%
+  stepAIC(trace=FALSE)
+summary(model)
+
+filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
+  stepAIC(trace=FALSE)
+summary(filteredmodel)
+```
+
 ## EDA
 
 ```{r}
