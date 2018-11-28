@@ -113,6 +113,23 @@ ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
 
 ```
 
+```{r}
+pima_pedigree <- pima %>%
+  group_by(PEDIGREE, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+#Pedigree may not be overly important; however, it does seem that 
+```
+
+```{r}
+pima_prg <- pima %>%
+  group_by(PRG, RESPONSE) %>%
+  summarize(response_total = n())
+ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
+  geom_density(alpha=0.5)
+```
+
 
 ## Plots
 
