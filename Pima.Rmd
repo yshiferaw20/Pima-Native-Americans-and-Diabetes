@@ -83,11 +83,12 @@ ggplot(pima_age, aes(x=AGE, y=response_total)) +
 ```{r}
 legend_title <- "Diabetic Group"
 pima_bp <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(BP > 0) %>%
   group_by(BP, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_bp, aes(x=BP, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5) + ylab("Density") + xlab("Diastolic Blood Pressure") + ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Blood Pressure") + scale_fill_manual(legend_title, values=c("Green","Red"))
+  geom_density(alpha=0.5) + ylab("Density") + xlab("Diastolic Blood Pressure") + ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Blood Pressure") + scale_fill_manual(legend_title, values=c("Blue","Red"))
 ```
 
 
