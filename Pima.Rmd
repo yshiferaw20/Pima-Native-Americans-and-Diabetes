@@ -6,28 +6,20 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
 library(mosaic)
 library(ggplot2)
 library(tidyverse)
-knitr::opts_chunk$set(echo = TRUE)
-require(mosaic)
-
 ```
 
 ## R Markdown
-
 
 ```{r}
 pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE)
 colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
 ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
 ## Predict the probability that individual females have diabetes
->>>>>>> 9319109b8f255227aa6f4973ccfae4f7f955da64
 
 ```{r}
 tally(pima$RESPONSE)
@@ -41,11 +33,11 @@ filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0)
 
 ```{r}
 model <- glm(RESPONSE~., data=pima, family=binomial) %>%
-  stepAIC(trace=FALSE)
+  MASS::stepAIC(trace=FALSE)
 summary(model)
 
 filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
-  stepAIC(trace=FALSE)
+  MASS::stepAIC(trace=FALSE)
 summary(filteredmodel)
 ```
 
@@ -65,84 +57,117 @@ tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
 ```
 
 
-
+## Plots
 
 ```{r}
 pima_age <- pima %>%
-  filter(RESPONSE == 1) %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   group_by(AGE, RESPONSE) %>%
   summarize(response_total = n())
 
 ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
-
-
-ggplot(pima_age, aes(x=AGE, y=response_total)) +
-  geom_density(stat="identity")
 ```
 
 ```{r}
-legend_title <- "Diabetic Group"
 pima_bp <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(BP > 0) %>%
   group_by(BP, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_bp, aes(x=BP, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5) + ylab("Density") + xlab("Diastolic Blood Pressure") + ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Blood Pressure") + scale_fill_manual(legend_title, values=c("Blue","Red"))
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Diastolic Blood Pressure") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Blood Pressure") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
 
 ```{r}
 pima_thick <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(THICK > 0) %>%
   group_by(THICK, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_thick, aes(x=THICK, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Triceps Skin Fold Thickness") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Triceps Skin Fold Thickness") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 #looks like females with greater thickness tend to have 
 ```
 
 ```{r}
 pima_plasma <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
+  filter(PLASMA > 0) %>%
   group_by(PLASMA, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_plasma, aes(x=PLASMA, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Plasma Glucose Concentration in Saliva") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Plasma Glucose Concentration in Saliva") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
 ```{r}
 pima_insulin <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
+  filter(INSULIN > 0) %>%
   group_by(INSULIN, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_insulin, aes(x=INSULIN, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Two Hours Serum Insulin") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Two Hours Serum Insulin") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
 
 ```{r}
 pima_body <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
+  filter(BODY > 0) %>%
   group_by(BODY, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
-
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Body Mass Index (Weight/Height)") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Body Mass Index (Weight/Height)") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
 ```{r}
 pima_pedigree <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
+  filter(PEDIGREE > 0) %>%
   group_by(PEDIGREE, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
-#Pedigree may not be overly important; however, it does seem that 
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Pedigree") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Pedigree") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
+#Pedigree may not be overly important; however, it does seem that there may be a slight relationship
 ```
 
 ```{r}
 pima_prg <- pima %>%
+  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
+  filter(PRG > 0) %>%
   group_by(PRG, RESPONSE) %>%
   summarize(response_total = n())
 ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
-  geom_density(alpha=0.5)
+  geom_density(alpha=0.5) +
+  ylab("Density") +
+  xlab("Number of Times Pregnant") +
+  ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Number of Times Pregnant") +
+  scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
 
