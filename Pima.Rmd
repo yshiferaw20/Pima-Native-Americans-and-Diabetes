@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(mosaic)
 library(ggplot2)
 library(tidyverse)
+library(pROC)
 ```
 
 ## R Markdown
@@ -41,6 +42,7 @@ filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
 summary(filteredmodel)
 ```
 
+
 ## EDA
 
 ```{r}
@@ -67,6 +69,7 @@ pima_age <- pima %>%
 
 ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
 ```
+
 
 ```{r}
 pima_bp <- pima %>%
@@ -95,8 +98,8 @@ ggplot(pima_thick, aes(x=THICK, fill=factor(RESPONSE))) +
   xlab("Triceps Skin Fold Thickness") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Triceps Skin Fold Thickness") +
   scale_fill_manual(legend_title, values=c("Red","Blue"))
-#looks like females with greater thickness tend to have 
 ```
+
 
 ```{r}
 pima_plasma <- pima %>%
@@ -111,6 +114,7 @@ ggplot(pima_plasma, aes(x=PLASMA, fill=factor(RESPONSE))) +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Plasma Glucose Concentration in Saliva") +
   scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
+
 
 ```{r}
 pima_insulin <- pima %>%
@@ -141,6 +145,7 @@ ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
   scale_fill_manual(legend_title, values=c("Red","Blue"))
 ```
 
+
 ```{r}
 pima_pedigree <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
@@ -155,6 +160,7 @@ ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
   scale_fill_manual(legend_title, values=c("Red","Blue"))
 #Pedigree may not be overly important; however, it does seem that there may be a slight relationship
 ```
+
 
 ```{r}
 pima_prg <- pima %>%
@@ -171,10 +177,13 @@ ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
 ```
 
 
-## Plots
+## ROC Curve
 
 ```{r}
-ggplot(pima, aes(x=AGE, y=BP)) + geom_bar(stat="identity", position = "dodge")
+
+plot.roc(filteredpima$RESPONSE, pima_bp$BP)
 ```
+
+
 
 
