@@ -11,6 +11,8 @@ library(mosaic)
 library(ggplot2)
 library(tidyverse)
 library(pROC)
+library(rpart)
+library(partykit)
 ```
 
 ## R Markdown
@@ -180,10 +182,29 @@ ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
 ## ROC Curve
 
 ```{r}
+predictions <- predict(filteredmodel, data=filteredpima)
+plot.roc(filteredpima$RESPONSE, predictions)
+auc(filteredpima$RESPONSE, predictions)
+```
 
-plot.roc(filteredpima$RESPONSE, pima_bp$BP)
+## Tree
+
+```{r}
+filteredmodelpart <- rpart(RESPONSE ~ ., data = filteredpima)
+printcp(filteredmodelpart)
+pdf("diabetes.pdf", width = 14, height = 14)
+plot(as.party(filteredmodelpart))
+dev.off()
+diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
 ```
 
 
-
+```{r}
+filteredmodelpart <- rpart(RESPONSE ~ . - AGE - PEDIGREE, data = filteredpima)
+printcp(filteredmodelpart)
+pdf("diabetes1.pdf", width = 14, height = 14)
+plot(as.party(filteredmodelpart))
+dev.off()
+diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
+```
 
