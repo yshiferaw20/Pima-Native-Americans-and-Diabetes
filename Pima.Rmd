@@ -2,11 +2,14 @@
 title: "Pima"
 author: "Brian Burrows, Eric Sellew, Yonas Shiferaw, and Kelly Yang"
 date: "12/3/2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+#Load Packages
 library(mosaic)
 library(ggplot2)
 library(tidyverse)
@@ -18,8 +21,8 @@ library(partykit)
 ## R Markdown
 
 ```{r}
-pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE)
-colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
+pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE) #Loading data
+colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE") #renaming column names
 ```
 
 ## Predict the probability that individual females have diabetes
@@ -31,14 +34,16 @@ tally(pima$RESPONSE)
 ```
 
 ```{r}
-filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0)
+filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0) #creates a dataset that does not have missing values that are denoted by 0
 ```
 
 ```{r}
+#Create a stepwise model
 model <- glm(RESPONSE~., data=pima, family=binomial) %>%
   MASS::stepAIC(trace=FALSE)
 summary(model)
 
+#Stepwise model using the filtered dataset
 filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
   MASS::stepAIC(trace=FALSE)
 summary(filteredmodel)
@@ -64,16 +69,7 @@ tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
 ## Plots
 
 ```{r}
-pima_age <- pima %>%
-  mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
-  group_by(AGE, RESPONSE) %>%
-  summarize(response_total = n())
-
-ggplot(pima_age, aes(x=AGE, y=response_total, fill=factor(RESPONSE))) + geom_bar(stat="identity", position = "dodge")
-```
-
-
-```{r}
+#Plot regarding blood pressure
 pima_bp <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(BP > 0) %>%
@@ -84,11 +80,12 @@ ggplot(pima_bp, aes(x=BP, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Diastolic Blood Pressure") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Blood Pressure") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ```{r}
+#Plot regarding skinfold thickness
 pima_thick <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(THICK > 0) %>%
@@ -99,11 +96,12 @@ ggplot(pima_thick, aes(x=THICK, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Triceps Skin Fold Thickness") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Triceps Skin Fold Thickness") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ```{r}
+#Plot regarding plasma level
 pima_plasma <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(PLASMA > 0) %>%
@@ -114,11 +112,12 @@ ggplot(pima_plasma, aes(x=PLASMA, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Plasma Glucose Concentration in Saliva") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Plasma Glucose Concentration in Saliva") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ```{r}
+#Plot regarding insulin levels
 pima_insulin <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(INSULIN > 0) %>%
@@ -129,11 +128,12 @@ ggplot(pima_insulin, aes(x=INSULIN, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Two Hours Serum Insulin") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Two Hours Serum Insulin") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ```{r}
+#Plot regarding BMI
 pima_body <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(BODY > 0) %>%
@@ -144,11 +144,12 @@ ggplot(pima_body, aes(x=BODY, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Body Mass Index (Weight/Height)") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Body Mass Index (Weight/Height)") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ```{r}
+#Plot regarding pedigree
 pima_pedigree <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(PEDIGREE > 0) %>%
@@ -159,12 +160,13 @@ ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Pedigree") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Pedigree") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 #Pedigree may not be overly important; however, it does seem that there may be a slight relationship
 ```
 
 
 ```{r}
+#plot regarding number of pregnancy
 pima_prg <- pima %>%
   mutate(RESPONSE = ifelse(RESPONSE == 0, "Non-Diabetic", "Diabetic"))%>%
   filter(PRG > 0) %>%
@@ -175,24 +177,26 @@ ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Number of Times Pregnant") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Number of Times Pregnant") +
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
+  scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 ```
 
 
 ## ROC Curve
 
 ```{r}
+#Creates a ROC Curve and prints out the area under the curve which suggests this model is pretty strong at approximately 86%
 predictions <- predict(filteredmodel, data=filteredpima)
 plot.roc(filteredpima$RESPONSE, predictions)
 auc(filteredpima$RESPONSE, predictions)
 ```
 
-## Tree
+## Classification Tree
 
 ```{r}
+#Creates a classifcation tree that denotes the thresholds: defines no diabetes, pre-diabetes, and diabetes
 filteredmodelpart <- rpart(RESPONSE ~ ., data = filteredpima)
 printcp(filteredmodelpart)
-pdf("diabetes.pdf", width = 14, height = 14)
+pdf("diabetes.pdf", width = 25, height = 10)
 plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
@@ -200,9 +204,10 @@ diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
 
 
 ```{r}
+#Removes age and pedigree from the classication tree (see pdf in the folder)
 filteredmodelpart <- rpart(RESPONSE ~ . - AGE - PEDIGREE, data = filteredpima)
 printcp(filteredmodelpart)
-pdf("diabetes1.pdf", width = 14, height = 14)
+pdf("diabetes1.pdf", width = 25, height = 12)
 plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
