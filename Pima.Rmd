@@ -1,8 +1,10 @@
 ---
-title: "Pima"
+title: "Type 2 Diabetes in Pima Native Americans"
 author: "Brian Burrows, Eric Sellew, Yonas Shiferaw, and Kelly Yang"
 date: "12/3/2018"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -22,42 +24,41 @@ pima <- read.csv("https://pmatheson.people.amherst.edu/Pima.dat", header=FALSE)
 colnames(pima) <- c("PRG", "PLASMA", "BP", "THICK", "INSULIN", "BODY", "PEDIGREE", "AGE", "RESPONSE")
 ```
 
-## Predict the probability that individual females have diabetes
+
+## Prevalence of Diabetes in the Dataset
 
 ```{r}
 tally(pima$RESPONSE)
 268/(500+268)
-#Approximately 35% of the individual females in this sample have diabetes 
+#Approximately 35% of the individual females in this sample have diabetes.
 ```
+
 
 ```{r}
 filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0)
+#We noticed biological impossibilities in the data, such as blood pressures of 0. Since it is not possible to distinguish true zeros from non-entries, we removed all entries that had zeros in PLASMA, BP, THICK, BODY, and INSULIN.
 ```
 
-```{r}
-model <- glm(RESPONSE~., data=pima, family=binomial) %>%
-  MASS::stepAIC(trace=FALSE)
-summary(model)
 
-filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
-  MASS::stepAIC(trace=FALSE)
-summary(filteredmodel)
+```{r}
+tally(filteredpima$RESPONSE)
+262/(262+130)
+#Approximately 67% of the individual females in the filtered dataset have diabetes.
 ```
 
 
 ## EDA
 
 ```{r}
-summary(pima)
-histogram(~PRG, data=pima) #PRG is skewed to the right
-histogram(~PLASMA, data=pima) #rather bell-shaped
-histogram(~BP, data=pima) #normal, but why are there so many 0s???
-histogram(~THICK, data=pima) #many zeros, and one outlier at 99, but normal otherwise
-histogram(~INSULIN, data=pima) #skewed to the right
-histogram(~BODY, data=pima) #kind of normal, slightly skewed to the right, many zeros
-histogram(~PEDIGREE, data=pima) #skewed to the right
-histogram(~AGE, data=pima) #skewed to the right
-tally(~RESPONSE, data=pima) #500 no diabetes, 268 do have diabetes
+summary(filteredpima)
+histogram(~PRG, data=filteredpima) #PRG is skewed to the right.
+histogram(~PLASMA, data=filteredpima) #Follows a somewhat normal distribution.
+histogram(~BP, data=filteredpima) #Also somewhat bell-shaped.
+histogram(~THICK, data=filteredpima) #Mostly normal distribution.
+histogram(~INSULIN, data=filteredpima) #Skewed to the right.
+histogram(~BODY, data=filteredpima) #Somewhat normal distribution, but is slightly skewed to the right.
+histogram(~PEDIGREE, data=filteredpima) #Skewed to the right.
+histogram(~AGE, data=filteredpima) #Skewed to the right.
 ```
 
 
@@ -160,7 +161,7 @@ ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
   xlab("Pedigree") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Pedigree") +
   scale_fill_manual(legend_title, values=c("Red","Blue"))
-#Pedigree may not be overly important; however, it does seem that there may be a slight relationship
+#Pedigree may not be overly important; however, it does seem that there may be a slight relationship.
 ```
 
 
@@ -179,7 +180,24 @@ ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
 ```
 
 
-## ROC Curve
+## Probability Model of Diabetes in an Individual Pima Female
+
+```{r}
+#Checking for an interaction.
+fmfull<-glm(RESPONSE~., data=filteredpima)
+vif(fmfull)
+#Although BODY and THICK are both measures of obesity, it seems that the inclusion of an interaction term is unnecessary.
+```
+
+
+```{r}
+filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
+  MASS::stepAIC(trace=FALSE)
+summary(filteredmodel) #The stepwise logistic regression returned PLASMA, BODY, and PEDIGREE as significant predictors of type 2 diabetes. AGE is also significant at the 10% significance level.
+```
+
+
+## ROC Curve: An Evaluation of the Probability Model
 
 ```{r}
 predictions <- predict(filteredmodel, data=filteredpima)
@@ -187,12 +205,13 @@ plot.roc(filteredpima$RESPONSE, predictions)
 auc(filteredpima$RESPONSE, predictions)
 ```
 
+
 ## Tree
 
 ```{r}
 filteredmodelpart <- rpart(RESPONSE ~ ., data = filteredpima)
 printcp(filteredmodelpart)
-pdf("diabetes.pdf", width = 14, height = 14)
+pdf("diabetes.pdf", width = 25, height = 12)
 plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
@@ -202,7 +221,7 @@ diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
 ```{r}
 filteredmodelpart <- rpart(RESPONSE ~ . - AGE - PEDIGREE, data = filteredpima)
 printcp(filteredmodelpart)
-pdf("diabetes1.pdf", width = 14, height = 14)
+pdf("diabetes1.pdf", width = 25, height = 12)
 plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
