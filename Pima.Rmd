@@ -16,6 +16,7 @@ library(tidyverse)
 library(pROC)
 library(rpart)
 library(partykit)
+library(MASS)
 ```
 
 ## R Markdown
@@ -36,17 +37,18 @@ tally(pima$RESPONSE)
 
 
 ```{r}
-<<<<<<< HEAD
 filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0)
 #We noticed biological impossibilities in the data, such as blood pressures of 0. Since it is not possible to distinguish true zeros from non-entries, we removed all entries that had zeros in PLASMA, BP, THICK, BODY, and INSULIN.
 ```
+
+
+## Probability Model of Diabetes in an Individual Pima Female
 
 
 ```{r}
 tally(filteredpima$RESPONSE)
 262/(262+130)
 #Approximately 67% of the individual females in the filtered dataset have diabetes.
-=======
 filteredpima <- filter(pima,PLASMA>0,BP>0,THICK>0,BODY>0,INSULIN>0) #creates a dataset that does not have missing values that are denoted by 0
 ```
 
@@ -59,10 +61,8 @@ summary(model)
 #Stepwise model using the filtered dataset
 filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
   MASS::stepAIC(trace=FALSE)
-summary(filteredmodel)
->>>>>>> b2096195ddaa531e7ee6b6a130de116f0e038a1f
+summary(filteredmodel) #The stepwise logistic regression returned PLASMA, BODY, and PEDIGREE as significant predictors of type 2 diabetes. AGE is also significant at the 10% significance level.
 ```
-
 
 ## EDA
 
@@ -173,13 +173,8 @@ ggplot(pima_pedigree, aes(x=PEDIGREE, fill=factor(RESPONSE))) +
   ylab("Density") +
   xlab("Pedigree") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Pedigree") +
-<<<<<<< HEAD
-  scale_fill_manual(legend_title, values=c("Red","Blue"))
-#Pedigree may not be overly important; however, it does seem that there may be a slight relationship.
-=======
   scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
 #Pedigree may not be overly important; however, it does seem that there may be a slight relationship
->>>>>>> b2096195ddaa531e7ee6b6a130de116f0e038a1f
 ```
 
 
@@ -196,23 +191,6 @@ ggplot(pima_prg, aes(x=PRG, fill=factor(RESPONSE))) +
   xlab("Number of Times Pregnant") +
   ggtitle("Relationship between Diabetic and Non-Diabetic Groups and Number of Times Pregnant") +
   scale_fill_manual("Diabetic Group", values=c("Red","Blue"))
-```
-
-
-## Probability Model of Diabetes in an Individual Pima Female
-
-```{r}
-#Checking for an interaction.
-fmfull<-glm(RESPONSE~., data=filteredpima)
-vif(fmfull)
-#Although BODY and THICK are both measures of obesity, it seems that the inclusion of an interaction term is unnecessary.
-```
-
-
-```{r}
-filteredmodel <- glm(RESPONSE~., data=filteredpima, family=binomial) %>%
-  MASS::stepAIC(trace=FALSE)
-summary(filteredmodel) #The stepwise logistic regression returned PLASMA, BODY, and PEDIGREE as significant predictors of type 2 diabetes. AGE is also significant at the 10% significance level.
 ```
 
 
