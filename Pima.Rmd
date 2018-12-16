@@ -225,27 +225,26 @@ plot.roc(filteredpima$RESPONSE, predictions)
 auc(filteredpima$RESPONSE, predictions)
 ```
 
-<<<<<<< HEAD
-
-## Tree
-=======
 ## Classification Tree
->>>>>>> b2096195ddaa531e7ee6b6a130de116f0e038a1f
 
 ```{r}
 #Creates a classifcation tree that denotes the thresholds: defines no diabetes, pre-diabetes, and diabetes
 filteredmodelpart <- rpart(RESPONSE ~ ., data = filteredpima)
 printcp(filteredmodelpart)
-<<<<<<< HEAD
 pdf("diabetes.pdf", width = 25, height = 12)
-=======
 pdf("diabetes.pdf", width = 25, height = 10)
->>>>>>> b2096195ddaa531e7ee6b6a130de116f0e038a1f
 plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
 ```
 
+
+A tree diagram is a way of representing a sequence of events and the purpose of using this diagram is to help predict if a patient has or does not have diabetes depending on certain thresholds of various physical characteristics. In this case, we start at the very top and examine an individual’s plasma glucose concentration and make a move to the left or the right depending on what the individual’s plasma concentration is. Then you would proceed to look at the next physical characteristic and make another move to the left or right again and again until you work your way to the bottom. The boxplots displayed on the bottom generally illustrate 2 sides: a lower risk side on the left and a higher risk side on the right
+
+This diagram shows that plasma glucose concentration is very important because plasma shows up a total of 4 times in the tree so it suggests that plasma level is a pretty big factor in determining if an individual has diabetes.
+
+
+We also created a classification tree diagram without age and pedigree as age and pedigree are uncontrollable factors.
 
 ```{r}
 #Removes age and pedigree from the classication tree (see pdf in the folder)
@@ -256,4 +255,10 @@ plot(as.party(filteredmodelpart))
 dev.off()
 diabetes <- mutate(filteredpima, fittedtree = predict(filteredmodelpart))
 ```
+
+
+## Recommendations
+
+We recommend that patients talk to their physician about their treatment choices. Namely focusing on the controllable factors such as plasma glucose concentration in saliva. Diet & exercise are cruical and they help lower levels of the most significant risk factors of diabetes (plasma, BMI, insulin, skinfold thickness, etc.).
+
 
